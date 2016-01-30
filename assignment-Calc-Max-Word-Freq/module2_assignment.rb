@@ -15,32 +15,13 @@ class LineAnalyzer
 
   def calculate_word_frequency()
     words = @content.downcase.split(/\W+/)
-    for word1 in words
-      count = 0
-      for word2 in words
-        if word1 == word2
-          count += 1
-          if count > @highest_wf_count
-            @highest_wf_count = count
-          end
-        end
-      end
+    counts = words.reduce(Hash.new(0)) do |hash, word| 
+      hash[word] += 1  
+      hash 
     end
-    for word1 in words
-      count = 0
-      for word2 in words
-        if word1 == word2
-          count += 1
-          if count == @highest_wf_count
-            until @highest_wf_words.include?(word1)
-              @highest_wf_words << word1
-            end
-          end
-        end
-      end
-    end
+    @highest_wf_count = counts.values.max
+    counts.each { |key, value| @highest_wf_words << key if value == counts.values.max }
   end
-
 end
 
 class Solution
@@ -61,11 +42,7 @@ class Solution
 
   def calculate_line_with_highest_frequency
     @highest_count_across_lines = 0
-    @analyzers.each do |item|
-      if item.highest_wf_count > @highest_count_across_lines
-        @highest_count_across_lines = item.highest_wf_count
-      end
-    end
+    @analyzers.each { |item| @highest_count_across_lines = item.highest_wf_count if item.highest_wf_count > @highest_count_across_lines  }
     @highest_count_words_across_lines = @analyzers.select { |item| item.highest_wf_count == @highest_count_across_lines }
   end
 
